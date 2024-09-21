@@ -1,0 +1,32 @@
+{
+  "name": "express-cli-builder",
+  "version": "1.0.8",
+  "main": "bin/express-cli.js",
+  "bin": {
+    "express": "bin/express-cli.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "express",
+    "cli",
+    "builder",
+    "express-cli",
+    "generator",
+    "nodejs",
+    "express-app",
+    "command-line",
+    "boilerplate",
+    "scaffolding"
+  ],
+  "author": "asad066",
+  "license": "ISC",
+  "description": "It provides an easy way to generate essential components such as models, routes, controllers, middlewares, and resources with boilerplate templates, streamlining project setup and organization.",
+  "dependencies": {
+    "commander": "^12.1.0",
+    "enquirer": "^2.4.1",
+    "fs-extra": "^11.2.0",
+    "inquirer": "^11.0.2"
+  }
+}
