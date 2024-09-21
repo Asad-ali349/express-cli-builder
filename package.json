@@ -1,6 +1,6 @@
 {
   "name": "express-cli-builder",
-  "version": "1.0.8",
+  "version": "1.1.1",
   "main": "bin/express-cli.js",
   "bin": {
     "express": "bin/express-cli.js"
@@ -28,5 +28,9 @@
     "enquirer": "^2.4.1",
     "fs-extra": "^11.2.0",
     "inquirer": "^11.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Asad-ali349/express-cli-builder.git"
   }
 }
