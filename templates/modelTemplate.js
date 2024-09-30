@@ -1,5 +1,5 @@
 module.exports = (modelName) => `
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const ${modelName}Schema = new mongoose.Schema({
     // Define your schema fields here

@@ -1,5 +1,5 @@
 module.exports = (controllerName) => `
-// const ${controllerName}Model = require('../models/${controllerName}.model.js');
+// import ${controllerName}Model from '../models/${controllerName}.model.js';
 
 exports.getAll = async (req, res) => {
     // Implement your logic to get all ${controllerName}s
