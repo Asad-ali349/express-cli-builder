@@ -8,23 +8,25 @@ When a database is selected, the CLI automatically configures the database conne
 To make navigation easier, the express --help command provides users with a list of all available commands, each with a short description of its functionality. This makes it simple to explore and use the CLI’s features, allowing developers to focus more on building features and reducing repetitive tasks.
 
 ## Installation
-To install Express CLI globally, run the following command:
 
+ 
+> **Note:**  To access the express-cli-builder commands from anywhere on your system, it is recommended to install the package globally using the following command:
 ``` bash
 npm install -g express-cli-builder
 ```
+> This will allow you to use the express command in any directory without needing to install it locally for every project.
+
 
 ## Usage
 Once installed, you can use the command line to generate different components for your Express.js app.
 
 ### Initialize a Basic App Template
 To initialize a basic Express app template, use the following command:
-> [!NOTE]
-> To access the express-cli-builder commands from anywhere on your system, it is recommended to install the package globally using the following command:
+
 ```bash
 express init
 ```
-> This will allow you to use the express command in any directory without needing to install it locally for every project.
+
 ***This command will prompt you with the following questions:***
 
 1. Would you like to use TypeScript or JavaScript?
@@ -33,6 +35,15 @@ express init
 
 Based on your answers, the appropriate packages (including cors, dotenv, and body-parser) will be installed, along with TypeScript types if you choose TypeScript.
 
+## List of All Commands
+To view all available commands, use the following command:
+
+```bash
+express --help
+```
+
+> **Tip:** Executing this command will display a list of all the commands along with their descriptions.
+
 ## Create a Model
 To generate a model, use the following command:
 
@@ -40,6 +51,7 @@ To generate a model, use the following command:
 express create:model <model-name>
 ```
 This command will create a model in the models folder. If the folder doesn’t exist, it will be created automatically.
+
 
 ## Create a Controller
 To generate a controller, use the following command:
@@ -87,7 +99,10 @@ This will create:
 - Build Controllers: Generate controller files to manage application logic and data interactions.
 - Set Up Middlewares: Create reusable middleware functions for enhanced application functionality.
 - Resource Creation: Create a full set of model, route, and controller files for rapid development.
+- Database Configuration: Automatically configure database connections and generate a .env file with necessary environment variables for MongoDB and MySQL, or skip database setup if desired.
+- Help Command: Use the express --help command to view all available commands with brief descriptions.
 ## Benefits
 - Consistent Structure: Ensures a standardized file structure for better organization and maintainability.
 - Time-Saving: Reduces repetitive boilerplate code, allowing developers to focus on building features.
 - Flexibility: Customize templates to fit project needs, enhancing code reusability.
+- Streamlined Setup: Simplifies the initial setup process with automated configurations and clear command documentation, making it easier for developers to start new projects.
