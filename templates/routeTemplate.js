@@ -1,11 +1,11 @@
-module.exports = (routeName) => `
+module.exports = (routeName, fileExtension) => `
 import express from 'express';
 const router = express.Router();
-import ${routeName}Controller from '../controllers/${routeName}.controller.js';
+import { getAll, create } from '../controllers/${routeName}.controller.${fileExtension}';
 
 // Define your routes here
-router.get('/', ${routeName}Controller.getAll);
-router.post('/', ${routeName}Controller.create);
+router.get('/', getAll);
+router.post('/', create);
 
-module.exports = router;
+export default router;
 `;

@@ -50,7 +50,9 @@ program
   .command('init')
   .description('Initialize a new Express project')
   .action(async () => {
+    
     try {
+
       const answers = await enquirer.prompt([
         {
           type: 'select',
@@ -277,7 +279,7 @@ function installDependencies(database, language, databaseName) {
   }
 
   if (language === 'TypeScript') {
-    installCommand += ' && npm install --save-dev typescript @types/express @types/node @types/cors ts-node nodemon';
+    installCommand += ' && npm install --save-dev typescript @types/express@4.17.13 @types/node @types/cors ts-node nodemon';
   }
 
   // Run the install command

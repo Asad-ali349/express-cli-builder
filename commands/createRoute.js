@@ -14,8 +14,11 @@ function createRoute(routeName) {
     console.log(`Created routes directory at: ${routesDir}`);
   }
 
-  const routeContent = routeTemplate(routeName);
-  fs.writeFileSync(path.join(routesDir, `${routeName}.routes.js`), routeContent);
+  const isTypeScript = fs.existsSync(path.join(process.cwd(), 'tsconfig.json'));
+  const fileExtension = isTypeScript ? 'ts' : 'js';
+
+  const routeContent = routeTemplate(routeName,fileExtension);
+  fs.writeFileSync(path.join(routesDir, `${routeName}.routes.${fileExtension}`), routeContent);
   console.log(`Route ${routeName} created successfully in the routes directory!`);
 }
 

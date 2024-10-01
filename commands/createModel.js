@@ -14,8 +14,11 @@ function createModel(modelName) {
     console.log(`Created models directory at: ${modelsDir}`);
   }
 
+  const isTypeScript = fs.existsSync(path.join(process.cwd(), 'tsconfig.json'));
+  const fileExtension = isTypeScript ? 'ts' : 'js';
+
   const modelContent = modelTemplate(modelName);
-  fs.writeFileSync(path.join(modelsDir, `${modelName}.model.js`), modelContent);
+  fs.writeFileSync(path.join(modelsDir, `${modelName}.model.${fileExtension}`), modelContent);
   console.log(`Model ${modelName} created successfully in the models directory!`);
 }
 
