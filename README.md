@@ -22,7 +22,7 @@ npm install -g express-cli-builder
 
 This installs two commands that do the same thing: `express` and `express-cli`.
 
-> **Note:** the official `express-generator` package also installs a command called `express`. If you have both installed, the one installed last wins. Use `express-cli` to be sure you are running this tool. The examples below use `express`.
+> **Tip:** If `express` runs a different tool on your machine (for example, because you also installed `express-generator`), use `express-cli` instead. Both names run this tool. The examples below use `express`.
 
 ## Quick start
 
