@@ -1,25 +1,14 @@
-const fs = require('fs');
-const path = require('path');
-const modelTemplate = require('../templates/modelTemplate');
+const { generate } = require('../lib/generators');
+const { ensureDatabase } = require('../lib/database');
 
-function createModel(modelName) {
-  const srcDir = path.join(process.cwd(), 'src');
-  const modelsDir = fs.existsSync(srcDir)
-    ? path.join(srcDir, 'models')
-    : path.join(process.cwd(), 'models');
-
-  // Check if the models directory exists, if not create it
-  if (!fs.existsSync(modelsDir)) {
-    fs.mkdirSync(modelsDir, { recursive: true });
-    console.log(`Created models directory at: ${modelsDir}`);
-  }
-
-  const isTypeScript = fs.existsSync(path.join(process.cwd(), 'tsconfig.json'));
-  const fileExtension = isTypeScript ? 'ts' : 'js';
-
-  const modelContent = modelTemplate(modelName);
-  fs.writeFileSync(path.join(modelsDir, `${modelName}.model.${fileExtension}`), modelContent);
-  console.log(`Model ${modelName} created successfully in the models directory!`);
+/** Creates a model; in a project without a database it first asks which one to set up. */
+async function createModel(modelName, options = {}) {
+  // Fail on bad names, unknown modules or existing files before touching anything.
+  generate(['model'], modelName, { ...options, check: true });
+  const setup = await ensureDatabase(options.cwd || process.cwd(), options);
+  const files = generate(['model'], modelName, { ...options, database: setup.database });
+  setup.install();
+  return files;
 }
 
 module.exports = createModel;
