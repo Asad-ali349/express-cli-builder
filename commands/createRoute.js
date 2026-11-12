@@ -1,25 +1,35 @@
 const fs = require('fs');
-const path = require('path');
-const routeTemplate = require('../templates/routeTemplate');
+const { generate } = require('../lib/generators');
+const { detectProject } = require('../lib/project');
+const { targetFile, resolveModule } = require('../lib/layout');
+const { validateName } = require('../lib/utils');
+const { decide } = require('../lib/prompt');
 
-function createRoute(routeName) {
-  const srcDir = path.join(process.cwd(), 'src');
-  const routesDir = fs.existsSync(srcDir)
-    ? path.join(srcDir, 'routes')
-    : path.join(process.cwd(), 'routes');
+/**
+ * A route imports the controller with the same name. When that controller
+ * does not exist yet, ask whether to create it too; otherwise the route is
+ * written with the controller parts commented out so the app keeps building.
+ */
+async function createRoute(routeName, options = {}) {
+  validateName(routeName, 'route name');
+  const project = detectProject(options.cwd || process.cwd());
+  const moduleName = resolveModule(project, options.module);
+  const controllerFile = targetFile(project, 'controller', routeName, moduleName);
 
-  // Check if the routes directory exists, if not create it
-  if (!fs.existsSync(routesDir)) {
-    fs.mkdirSync(routesDir, { recursive: true });
-    console.log(`Created routes directory at: ${routesDir}`);
-  }
+  if (fs.existsSync(controllerFile)) return generate(['route'], routeName, options);
 
-  const isTypeScript = fs.existsSync(path.join(process.cwd(), 'tsconfig.json'));
-  const fileExtension = isTypeScript ? 'ts' : 'js';
+  const withController = await decide(options, 'controller', `The ${routeName} controller does not exist yet. Create it too?`, {
+    flag: '--controller',
+  });
+  if (withController) return generate(['route', 'controller'], routeName, options);
 
-  const routeContent = routeTemplate(routeName,fileExtension);
-  fs.writeFileSync(path.join(routesDir, `${routeName}.routes.${fileExtension}`), routeContent);
-  console.log(`Route ${routeName} created successfully in the routes directory!`);
+  const files = generate(['route'], routeName, { ...options, withController: false });
+  console.log(
+    `The route's handlers are commented out until the controller exists. Run "express create:controller ${routeName}${
+      moduleName ? ` --module ${moduleName}` : ''
+    }", then uncomment them.`
+  );
+  return files;
 }
 
 module.exports = createRoute;

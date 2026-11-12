@@ -1,287 +1,191 @@
 #!/usr/bin/env node
 
+const fs = require('fs');
+const path = require('path');
 const { Command } = require('commander');
-const Enquirer = require('enquirer');
-const fs = require('fs-extra');
-const { execSync } = require('child_process');
+const pkg = require('../package.json');
 const createModel = require('../commands/createModel');
 const createRoute = require('../commands/createRoute');
 const createController = require('../commands/createController');
 const createMiddleware = require('../commands/createMiddleware');
 const createResource = require('../commands/createResource');
+const createValidation = require('../commands/createValidation');
+const createService = require('../commands/createService');
+const { scaffold, installDependencies, getInstallCommands, EXTRAS } = require('../lib/init');
+
 const program = new Command();
-const enquirer = new Enquirer();
+
+/** Reports failures on stderr and through the exit code instead of a stack trace. */
+function handleErrors(action) {
+  return async (...args) => {
+    try {
+      await action(...args);
+    } catch (error) {
+      // Enquirer rejects with an empty value when a prompt is cancelled (Ctrl+C).
+      console.error(error && error.message ? `Error: ${error.message}` : 'Cancelled.');
+      process.exitCode = 1;
+    }
+  };
+}
+
+const FORCE = ['-f, --force', 'overwrite files that already exist'];
+const NO_MOUNT = ['--no-mount', 'do not register the route in the app file'];
+const NO_INSTALL = ['--skip-install', 'do not install missing packages (zod, database driver); print the command instead'];
+const MODULE = ['-m, --module <module>', 'put the file in this module (modular projects only)'];
+const DATABASE = ['--database <database>', 'database to set up if the project has none (MongoDB or MySQL)'];
+
+program
+  .name('express')
+  .description('Generate Express application components')
+  .version(pkg.version, '-v, --version');
 
 program
   .command('create:model <modelName>')
   .description('Create a new model')
-  .action(createModel);
+  .option(...FORCE)
+  .option(...MODULE)
+  .option(...DATABASE)
+  .option(...NO_INSTALL)
+  .action(handleErrors((name, options) => createModel(name, { ...options, install: !options.skipInstall })));
+
 
 program
   .command('create:route <routeName>')
   .description('Create a new route')
-  .action(createRoute);
+  .option(...FORCE)
+  .option(...MODULE)
+  .option(...NO_MOUNT)
+  .option('--controller', 'also create the controller if it does not exist yet')
+  .option('--no-controller', 'do not create a missing controller (route handlers are commented out)')
+  .action(handleErrors(createRoute));
 
 program
   .command('create:controller <controllerName>')
   .description('Create a new controller')
-  .action(createController);
+  .option(...FORCE)
+  .option(...MODULE)
+  .action(handleErrors(createController));
 
 program
   .command('create:middleware <middlewareName>')
   .description('Create a new middleware')
-  .action(createMiddleware);
+  .option(...FORCE)
+  .option(...MODULE)
+  .action(handleErrors(createMiddleware));
+
+program
+  .command('create:validation <validationName>')
+  .description('Create a new zod validation (installs zod if it is missing)')
+  .option(...FORCE)
+  .option(...MODULE)
+  .option(...NO_INSTALL)
+  .action(handleErrors((name, options) => createValidation(name, { ...options, install: !options.skipInstall })));
+
+program
+  .command('create:service <serviceName>')
+  .description('Create a new service (modular projects only)')
+  .option(...FORCE)
+  .option(...MODULE)
+  .action(handleErrors(createService));
 
 program
   .command('create:resource <resourceName>')
-  .description('Create a new resource with model, route, and controller')
-  .action(createResource);
-
-// Add the help command
-program
-  .command('help')
-  .description('Show help for all available commands')
-  .action(() => {
-    program.outputHelp(); // Show help output
-  });
-
+  .description('Create a new resource with model, validation, route, and controller')
+  .option(...FORCE)
+  .option(...NO_MOUNT)
+  .option(...NO_INSTALL)
+  .option('--docs', 'add Swagger docs for this module without asking (modular projects with Swagger)')
+  .option('--no-docs', 'do not add Swagger docs for this module')
+  .option('--tests', 'add tests for this module without asking (modular projects with Testing)')
+  .option('--no-tests', 'do not add tests for this module')
+  .option(...DATABASE)
+  .action(handleErrors((name, options) => createResource(name, { ...options, install: !options.skipInstall })));
 
 program
   .command('init')
-  .description('Initialize a new Express project')
-  .action(async () => {
-    
-    try {
+  .description('Initialize a new Express project in the current directory')
+  .option('-f, --force', 'overwrite an existing project (.env and .gitignore are always kept)')
+  .option('--skip-install', 'create the files without running npm install')
+  .action(handleErrors(initProject));
 
-      const answers = await enquirer.prompt([
-        {
-          type: 'select',
-          name: 'language',
-          message: 'Would you like to use TypeScript or JavaScript?',
-          choices: ['TypeScript', 'JavaScript'],
-        },
-        {
-          type: 'select',
-          name: 'useSrc',
-          message: 'Do you want to use the src folder?',
-          choices: ['Yes', 'No'],
-        },
-        {
-          type: 'select',
-          name: 'database',
-          message: 'Would you like to use database?',
-          choices: ['Yes', 'No'],
-        },
-      ]);
-
-      const { language, useSrc, database } = answers;
-      let databaseName = 'No';
-      if(database === 'Yes'){
-        const dbNameChoice = await enquirer.prompt([
-          {
-            type: 'select',
-            name: 'databaseName',
-            message: 'Which database would you like to use?',
-            choices: ['MongoDB', 'MySQL'],
-          },
-        ]);
-        databaseName= dbNameChoice.databaseName;
-      }
-
-
-      const folderStructure = useSrc=='Yes' ? 'src' : '';
-
-      // Create folder structure
-      await createFolderStructure(folderStructure, language, database, databaseName);
-
-      // Install dependencies
-      installDependencies(database, language, databaseName);
-      console.log('Express app initialized successfully!');
-    } catch (error) {
-      console.error('Error initializing the Express app:', error);
-    }
-  });
-
-program.parse(process.argv);
-
-async function createFolderStructure(baseFolder, language , database, databaseName) {
-  const baseDir = baseFolder ? `${baseFolder}/` : '';
-  const fileExtension = language === 'TypeScript' ? 'ts' : 'js';
-
-  // Create basic folder structure
-  fs.ensureDirSync(`${baseDir}controllers`);
-  if(database === 'Yes'){
-    fs.ensureDirSync(`${baseDir}models`);
-  }
-  fs.ensureDirSync(`${baseDir}routes`);
-  fs.ensureDirSync(`${baseDir}config`);
-
-  // Create basic app file
-  const appFileContent = `
-import express from 'express';
-import cors from 'cors';
-import bodyParser from 'body-parser';
-import dotenv from 'dotenv';
-${
-database==='Yes' ? `import {connectDB} from './config/db.config.${fileExtension}';`:``
-}
-
-dotenv.config();
-const app = express();
-app.use(cors());
-app.use(bodyParser.json());
-
-app.get('/',(req,res)=>{
-  res.send('<h1>Welcome to Express App</h1>')
-})
-
-const PORT = process.env.PORT || 3000;
-
-${
- database ==='No'? 
-`app.listen(PORT, () => {
-  console.log(\`Server running on port \${PORT}\`);
-});`
-:
-`
-connectDB().then(() => {
-  app.listen(PORT, () => {
-      console.log(\`Server running on port: \${PORT}\`);
-  });
-}).catch((err) => {
-  console.log('DB connection error', err);
-});
-`
-}
-
-  `;
-  fs.writeFileSync(`${baseDir}app.${fileExtension}`, appFileContent.trim());
-
-  // Create package.json
-  const packageJsonContent = {
-    name: "your-project-name", // Replace with actual project name
-    version: "1.0.0",
-    description: "A brief description of your project",
-    main: `app.${fileExtension}`,
-    ...(language !== 'TypeScript' && { type: 'module' }),
-    scripts: {
-      start: language === 'TypeScript' ? "tsc && node dist/app.js" : "nodemon src/app.js",
-      dev: language === 'TypeScript' ? "nodemon src/app.ts" : "nodemon src/app.js"
-    },
-    dependencies: {},
-  };
-
-  await fs.writeFileSync(`./package.json`, JSON.stringify(packageJsonContent, null, 2));
-
-  const dotEnvContent= `
-# Database connection details for MySQL
-DB_HOST=localhost        # The hostname of your MySQL database
-DB_USER=root             # Your MySQL username
-DB_PASSWORD=             # Your MySQL password
-DB_NAME=your_database    # The name of your MySQL database
-
-# Database connection details for Mongo
-CONNECTION_URL=mongodb+srv://<username>:<password>@cluster.mongodb.net/test
-
-# Server configuration
-PORT=5000  # Port on which your Express server will run
-`;
-
-await fs.writeFileSync(`./.env`, dotEnvContent.trim());
-  if(language=='TypeScript'){
-    const tsconfig={
-      "compilerOptions": {
-        "target": "es6",
-        "module": "commonjs",
-        "outDir": "./dist",
-        "rootDir": "./src",
-        "strict": true,
-        "esModuleInterop": true,
-        "allowImportingTsExtensions": true,
-        "noEmit": true
-      }
-    }
-    await fs.writeFileSync(`./tsconfig.json`, JSON.stringify(tsconfig, null, 2));
-    if(database==='Yes'){
-      createConfig (baseDir,databaseName,'ts')
-    }
-  }else{
-    if(database==='Yes'){
-      createConfig (baseDir,databaseName,'js')
-    }
+async function initProject(options) {
+  const cwd = process.cwd();
+  if (!options.force && fs.existsSync(path.join(cwd, 'package.json'))) {
+    throw new Error(
+      'This directory already contains a package.json. Run "express init" in an empty directory, or pass --force to overwrite it.'
+    );
   }
 
-}
+  // Loaded lazily so the create:* commands do not pay for the prompt library.
+  const Enquirer = require('enquirer');
+  const enquirer = new Enquirer();
 
-function createConfig(baseDir,databaseName, fileType) {
-  const dbConfigs = {
-    MongoDB: `
-    // config/db.${fileType}
-    import mongoose from 'mongoose';
+  const { size } = await enquirer.prompt({
+    type: 'select',
+    name: 'size',
+    message: 'How big is this project?',
+    choices: [
+      { name: 'small', message: 'Small (simple structure)' },
+      { name: 'large', message: 'Large (modular, scalable)' },
+    ],
+  });
+  const { language } = await enquirer.prompt({
+    type: 'select',
+    name: 'language',
+    message: 'Would you like to use TypeScript or JavaScript?',
+    choices: ['TypeScript', 'JavaScript'],
+  });
+  // Large projects always use src.
+  let useSrc = true;
+  if (size === 'small') {
+    const answer = await enquirer.prompt({
+      type: 'select',
+      name: 'useSrc',
+      message: 'Do you want to use the src folder?',
+      choices: ['Yes', 'No'],
+    });
+    useSrc = answer.useSrc === 'Yes';
+  }
+  const { database } = await enquirer.prompt({
+    type: 'select',
+    name: 'database',
+    message: 'Which database would you like to use?',
+    choices: ['MongoDB', 'MySQL', 'None'],
+  });
+  let features = [];
+  if (size === 'large') {
+    const answer = await enquirer.prompt({
+      type: 'multiselect',
+      name: 'features',
+      message: 'Which extras do you want? (space to select, enter to confirm; none is fine)',
+      choices: EXTRAS.map((extra) => ({ name: extra.key, message: extra.label })),
+    });
+    features = answer.features;
+  }
 
-    export const connectDB = async () => {
-      try {
-        const conn = await mongoose.connect(process.env.CONNECTION_URL ${fileType=='ts'?'as string':''});
-        console.log(\`MongoDB Connected: \${conn.connection.host}\`);
-        return conn;
-      } catch (error) {
-        console.error('Mongodb connection error', error);
-        throw error;
-      }
-    };
-    `,
-    MySQL: `
-    // config/db.${fileType}
-    import mysql from 'mysql2/promise';
-
-    export const connectDB = async () => {
-      try {
-        const connection = await mysql.createConnection({
-          host: process.env.DB_HOST,
-          user: process.env.DB_USER,
-          password: process.env.DB_PASSWORD,
-          database: process.env.DB_NAME,
-        });
-
-        console.log(\`MySQL Connected: \${connection.config.host}\`);
-        return connection;
-      } catch (error) {
-        console.error('MySQL connection error', error);
-        throw error;
-      }
-    };
-    `,
+  const settings = {
+    cwd,
+    size,
+    language,
+    useSrc,
+    database: database === 'None' ? null : database,
+    features,
+    force: Boolean(options.force),
   };
 
-  // Check if the provided database name exists in the `dbConfigs` object
-  const dbConfig = dbConfigs[databaseName];
+  scaffold(settings);
+  console.log('Project files created.');
 
-  if (!dbConfig) {
-    console.error('Unsupported database name provided!');
+  if (options.skipInstall) {
+    console.log('Skipped dependency installation. To install later, run:');
+    for (const args of getInstallCommands(settings)) console.log(`  npm ${args.join(' ')}`);
     return;
   }
-
-  fs.writeFileSync(`${baseDir}config/db.config.${fileType}`, dbConfig.trim());
-
-  console.log(`Configuration file for ${databaseName} has been created`);
+  installDependencies(settings);
+  console.log('Express app initialized successfully! Start it with "npm run dev".');
+  if (size === 'large') {
+    console.log('Add your first module with: express create:resource <name>');
+  }
 }
 
-
-
-function installDependencies(database, language, databaseName) {
-  // Common dependencies
-  let installCommand = 'npm install express cors dotenv body-parser';
-
-  if (database === 'Yes' && databaseName === 'MongoDB') {
-    installCommand += ' mongoose';
-  } else if (database === 'Yes' && databaseName === 'MySQL') {
-    installCommand += ' mysql2';
-  }
-
-  if (language === 'TypeScript') {
-    installCommand += ' && npm install --save-dev typescript @types/express@4.17.13 @types/node @types/cors ts-node nodemon';
-  }
-
-  // Run the install command
-  execSync(installCommand, { stdio: 'inherit' });
-}
+program.parseAsync(process.argv);
