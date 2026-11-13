@@ -1,5 +1,11 @@
 # express-cli-builder
 
+[![npm version](https://img.shields.io/npm/v/express-cli-builder)](https://www.npmjs.com/package/express-cli-builder)
+[![npm downloads](https://img.shields.io/npm/dm/express-cli-builder)](https://www.npmjs.com/package/express-cli-builder)
+[![tests](https://github.com/Asad-ali349/express-cli-builder/actions/workflows/ci.yml/badge.svg)](https://github.com/Asad-ali349/express-cli-builder/actions/workflows/ci.yml)
+[![node](https://img.shields.io/node/v/express-cli-builder)](https://nodejs.org/)
+[![license](https://img.shields.io/npm/l/express-cli-builder)](LICENSE)
+
 **A command-line tool that sets up Express.js projects and generates their building blocks.**
 
 Start a new Express app in TypeScript or JavaScript, with MongoDB, MySQL or no database, in a simple layout for small apps or a modular, NestJS-style layout for larger ones. Then generate models, routes, controllers, services, validations, middlewares or complete CRUD resources that are wired together and work right away.
@@ -8,6 +14,18 @@ Start a new Express app in TypeScript or JavaScript, with MongoDB, MySQL or no d
 - **Working CRUD in one command:** `create:resource` generates the model, validation, route, controller (and service), mounts the route and gives you five REST endpoints.
 - **Safe by default:** nothing is overwritten without `--force`, names are validated, input is validated with zod, empty records are never saved, and internal errors are never shown to clients.
 - **Matches your project:** files follow your layout, language (`.ts` / `.js`), module system and database.
+
+## Why express-cli-builder?
+
+| | express-cli-builder | express-generator | NestJS CLI |
+| --- | --- | --- | --- |
+| What you get | A plain Express API | A plain Express app with server-rendered views | An app built on the NestJS framework |
+| TypeScript | Yes, or JavaScript | JavaScript only | TypeScript |
+| Database setup | MongoDB or MySQL, wired in | None | Add it yourself |
+| Generate parts later | Resources, models, routes, controllers, services, validations, middlewares | No; it creates the initial app only | Yes |
+| Concepts to learn | Express only | Express only | NestJS (decorators, modules, dependency injection) |
+
+Choose express-cli-builder when you want to stay with plain Express but skip the repetitive setup: a ready project, input validation, error handling, and CRUD endpoints that work from the first command.
 
 ## Requirements
 
@@ -298,6 +316,10 @@ npm test
 
 The tests use the built-in Node.js test runner. `npm install` also installs `express`, `cors` and `zod` as development dependencies, which some tests use to run generated code for real. To try your local copy as a global command, run `npm link`.
 
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for what changed in each version.
+
 ## License
 
-ISC
+[ISC](LICENSE)
