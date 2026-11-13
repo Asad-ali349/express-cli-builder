@@ -15,6 +15,8 @@ Start a new Express app in TypeScript or JavaScript, with MongoDB, MySQL or no d
 - **Safe by default:** nothing is overwritten without `--force`, names are validated, input is validated with zod, empty records are never saved, and internal errors are never shown to clients.
 - **Matches your project:** files follow your layout, language (`.ts` / `.js`), module system and database.
 
+![express-cli-builder demo: init a project, create a resource, call the API](https://raw.githubusercontent.com/Asad-ali349/express-cli-builder/main/docs/demo.svg)
+
 ## Why express-cli-builder?
 
 | | express-cli-builder | express-generator | NestJS CLI |
