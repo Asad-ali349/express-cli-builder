@@ -4,7 +4,16 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [Unreleased]
 
-## [2.0.2] - 2026-11-13
+## [2.0.3] - 2026-11-13
+
+First release published from GitHub Actions. It contains the changes listed under 2.0.2.
+
+### Fixed
+- The publish workflow no longer passes `--provenance`; npm trusted publishing adds provenance itself, and signing twice made the 2.0.2 publish fail.
+
+## [2.0.2] - 2026-11-13 [not published to npm]
+
+The automated publish failed, so this version is not on npm. Its changes are released in 2.0.3.
 
 ### Added
 - LICENSE file, this changelog, README badges and a comparison with other Express tools.
@@ -50,7 +59,8 @@ All notable changes to this project are documented here. The format is based on 
 
 The first releases: `express init` for a basic JavaScript or TypeScript app with MongoDB or MySQL, and the `create:model`, `create:route`, `create:controller`, `create:middleware` and `create:resource` commands.
 
-[Unreleased]: https://github.com/Asad-ali349/express-cli-builder/compare/v2.0.2...HEAD
+[Unreleased]: https://github.com/Asad-ali349/express-cli-builder/compare/v2.0.3...HEAD
+[2.0.3]: https://github.com/Asad-ali349/express-cli-builder/compare/v2.0.2...v2.0.3
 [2.0.2]: https://github.com/Asad-ali349/express-cli-builder/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/Asad-ali349/express-cli-builder/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/Asad-ali349/express-cli-builder/releases/tag/v2.0.0

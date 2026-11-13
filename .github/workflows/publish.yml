@@ -1,6 +1,7 @@
 name: publish
 
-# Publishes to npm when a GitHub release is published, with provenance.
+# Publishes to npm when a GitHub release is published. Provenance is added
+# automatically by npm trusted publishing.
 # Uses npm trusted publishing (OIDC): no npm token is stored in this repository.
 on:
   release:
@@ -30,4 +31,6 @@ jobs:
             echo "Release tag ${GITHUB_REF_NAME} does not match package.json version ${version}" >&2
             exit 1
           fi
-      - run: npm publish --provenance --access public
+      # Trusted publishing adds provenance automatically; passing --provenance as
+      # well makes npm sign twice and fails with TLOG_CREATE_ENTRY_ERROR (409).
+      - run: npm publish --access public
