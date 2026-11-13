@@ -1,45 +1,60 @@
 {
   "name": "express-cli-builder",
   "version": "2.0.1",
-  "main": "bin/express-cli.js",
-  "bin": {
-    "express": "bin/express-cli.js",
-    "express-cli": "bin/express-cli.js"
-  },
-  "scripts": {
-    "test": "node --test"
-  },
+  "description": "Express.js CLI: scaffold JavaScript or TypeScript APIs with MongoDB or MySQL, and generate working CRUD resources, models, routes, controllers and validations.",
   "keywords": [
     "express",
-    "cli",
-    "builder",
+    "expressjs",
     "express-cli",
+    "cli",
     "generator",
-    "nodejs",
-    "express-app",
-    "command-line",
+    "scaffold",
+    "scaffolding",
     "boilerplate",
-    "scaffolding"
+    "starter",
+    "crud",
+    "rest-api",
+    "api",
+    "backend",
+    "typescript",
+    "mongodb",
+    "mongoose",
+    "mysql",
+    "zod",
+    "mvc",
+    "nodejs"
   ],
-  "author": "asad066",
-  "license": "ISC",
-  "description": "It provides an easy way to generate essential components such as models, routes, controllers, middlewares, and resources with boilerplate templates, streamlining project setup and organization.",
-  "dependencies": {
-    "commander": "^12.1.0",
-    "enquirer": "^2.4.1"
+  "homepage": "https://github.com/Asad-ali349/express-cli-builder#readme",
+  "bugs": {
+    "url": "https://github.com/Asad-ali349/express-cli-builder/issues"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Asad-ali349/express-cli-builder.git"
   },
+  "license": "ISC",
+  "author": "asad066",
+  "main": "bin/express-cli.js",
+  "bin": {
+    "express": "bin/express-cli.js",
+    "express-cli": "bin/express-cli.js"
+  },
   "files": [
     "bin",
     "commands",
     "lib",
-    "templates"
+    "templates",
+    "CHANGELOG.md"
   ],
   "engines": {
     "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "enquirer": "^2.4.1"
   },
   "devDependencies": {
     "cors": "^2.8.6",
