@@ -1,6 +1,6 @@
 {
   "name": "express-cli-builder",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Express.js CLI: scaffold JavaScript or TypeScript APIs with MongoDB or MySQL, and generate working CRUD resources, models, routes, controllers and validations.",
   "keywords": [
     "express",

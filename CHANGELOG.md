@@ -4,6 +4,8 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [Unreleased]
 
+## [2.0.2] - 2026-11-13
+
 ### Added
 - LICENSE file, this changelog, README badges and a comparison with other Express tools.
 - Continuous integration: the test suite runs on every push and pull request.
@@ -48,6 +50,7 @@ All notable changes to this project are documented here. The format is based on 
 
 The first releases: `express init` for a basic JavaScript or TypeScript app with MongoDB or MySQL, and the `create:model`, `create:route`, `create:controller`, `create:middleware` and `create:resource` commands.
 
-[Unreleased]: https://github.com/Asad-ali349/express-cli-builder/compare/v2.0.1...HEAD
+[Unreleased]: https://github.com/Asad-ali349/express-cli-builder/compare/v2.0.2...HEAD
+[2.0.2]: https://github.com/Asad-ali349/express-cli-builder/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/Asad-ali349/express-cli-builder/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/Asad-ali349/express-cli-builder/releases/tag/v2.0.0
