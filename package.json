@@ -22,7 +22,22 @@
     "mysql",
     "zod",
     "mvc",
-    "nodejs"
+    "nodejs",
+    "express-boilerplate",
+    "express-starter",
+    "express-api",
+    "express-typescript",
+    "express-mongodb",
+    "express-mysql",
+    "api-generator",
+    "code-generator",
+    "project-generator",
+    "crud-generator",
+    "rest",
+    "node",
+    "javascript",
+    "modular",
+    "validation"
   ],
   "homepage": "https://github.com/Asad-ali349/express-cli-builder#readme",
   "bugs": {
